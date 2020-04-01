@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from datetime import date as datemethod
+from datetime import datetime
 
 #Random output generator
 def coin_flip(ptrue):
@@ -25,7 +26,7 @@ def coin_flip(ptrue):
 
 
 # Determine if infection is transmitted
-def infect(agent_1, agent_2, ptrans, reinfection_rate):
+def infect(agent_1, agent_2, ptrans, psevere, reinfection_rate):
     was_infected = agent_2.was_infected
     if (agent_2.infected == False) and (agent_2.susceptible == True):
         if agent_1.infected == True:
@@ -33,14 +34,19 @@ def infect(agent_1, agent_2, ptrans, reinfection_rate):
                 agent_2.infected = coin_flip(ptrans)
                 if agent_2.infected == True:
                     infected_bool = True
+                    agent_2.severe = coin_flip(psevere)
                 else:
                     infected_bool = False
+                    agent_2.severe = False
             else:
-                agent_2.infected = coin_flip(reinfection_rate)
+                #agent_2.infected = coin_flip(reinfection_rate)
+                agent_2.infected = coin_flip(ptrans)
                 if agent_2.infected == True:
                     infected_bool = True
+                    agent_2.severe = coin_flip(psevere)
                 else:
                     infected_bool = False
+                    agent_2.severe = False
         else:
             agent_2.infected = agent_2.infected
             infected_bool = False
@@ -51,7 +57,7 @@ def infect(agent_1, agent_2, ptrans, reinfection_rate):
 
 #Instantiate social network
 #Chaos parameter allows for variability in following social distancing recommendations.
-def build_network(interactions, population, chaos = 0.01):
+def build_network(interactions, population, chaos = 0.001):
     G = nx.Graph()
     G.add_nodes_from(range(population))
     nodes_list = list(G.nodes())
@@ -77,63 +83,77 @@ def build_network(interactions, population, chaos = 0.01):
 
 #Compute SIR and dead at any point in time
 def compute_susceptible(model):
-    N = float(model.num_agents)
     total_susceptible = float(model.susceptible)
-    susceptible_rate = total_susceptible/N
-    return susceptible_rate
+    return total_susceptible
 
 def compute_infected(model):
-    N = float(model.num_agents)
     total_infected = float(model.infected)
-    infected_rate = total_infected/N
-    return infected_rate
+    return total_infected
 
 def compute_recovered(model):
-    N = float(model.num_agents)
     total_recovered = float(model.recovered)
-    recovered_rate = total_recovered/N
-    return recovered_rate
+    return total_recovered
 
 def compute_dead(model):
-    N = float(model.num_agents)
     total_dead = float(model.dead)
-    death_rate = total_dead/N
-    return death_rate
+    return total_dead
 
 # Compute R0
 def compute_R0(model):
-    induced_infections = [agent.induced_infections for agent in model.schedule.agents]
+    induced_infections = [a.induced_infections for a in model.schedule.agents if a.infected_others == True]
+    if len(induced_infections) == 0:
+        induced_infections = [0]
     #induced_infections_ = [value for value in induced_infections if value != 0]
     infection_array = np.array(induced_infections)
     R0 = np.average(infection_array)
     return R0
 
+# Compute number of severe cases
+def compute_severe(model):
+    severe_infections_ = [1 for a in model.schedule.agents if a.severe == True]
+    severe_infections = sum(severe_infections_)
+    return severe_infections
+
 
 # Plot output
 def plot_SIR(df_out, output_path):
-    today = datemethod.strftime(datemethod.today(), '%Y-%m-%d')
-    plot_name = today + 'SIR_.png'
+    today = datemethod.strftime(datetime.utcnow(), '%Y%m%dZ%H%M%S')
+    plot_name = 'SIR_' + today + '_.png'
     ax = plt.subplot(111)
     for column in list(df_out.columns):
-        if column != 'R0':
+        if (column != 'R0') and (column != 'severe_cases'):
             ax.plot(df_out[column], label=column)
     plt.title('COVID ABM Model Output - SIR')
-    plt.xlabel('Step')
-    plt.ylabel('Population Fraction')
+    plt.xlabel('Day')
+    plt.ylabel('Population')
     ax.legend()
     plt.savefig(os.path.join(output_path, plot_name), dpi=300)
     plt.close()
     
 def plot_R0(df_out, output_path):
-    today = datemethod.strftime(datemethod.today(), '%Y-%m-%d')
-    plot_name = today + 'R0_.png'
+    today = datemethod.strftime(datetime.utcnow(), '%Y%m%dZ%H%M%S')
+    plot_name = 'R0_' + today + '_.png'
     ax = plt.subplot(111)
     for column in list(df_out.columns):
         if column == 'R0':
             ax.plot(df_out[column], label=column)
     plt.title('COVID ABM Model Output - R0')
-    plt.xlabel('Step')
+    plt.xlabel('Day')
     plt.ylabel('R0')
+    ax.legend()
+    plt.savefig(os.path.join(output_path, plot_name), dpi=300)
+    plt.close()
+
+def plot_severe(df_out, output_path):
+    today = datemethod.strftime(datetime.utcnow(), '%Y%m%dZ%H%M%S')
+    plot_name = 'Severe_Cases_' + today + '_.png'
+    ax = plt.subplot(111)
+    for column in list(df_out.columns):
+        if column == 'severe_cases':
+            ax.plot(df_out[column], label=column)
+    plt.title('COVID ABM Model Output - Severe Cases')
+    plt.xlabel('Day')
+    plt.ylabel('Number of Severe Cases')
     ax.legend()
     plt.savefig(os.path.join(output_path, plot_name), dpi=300)
     plt.close()

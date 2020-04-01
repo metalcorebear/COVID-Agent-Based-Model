@@ -39,11 +39,12 @@ class COVID_model(Model):
             self.schedule.add(new_agent)
     
         #self.meme = 0
-        self.datacollector = DataCollector(model_reporters={"infected_fraction": model_functions.compute_infected, 
-                                                            "recovered_fraction": model_functions.compute_recovered, 
-                                                            "susceptible_fraction": model_functions.compute_susceptible, 
-                                                            "dead_fraction": model_functions.compute_dead, 
-                                                            "R0": model_functions.compute_R0})
+        self.datacollector = DataCollector(model_reporters={"infected": model_functions.compute_infected, 
+                                                            "recovered": model_functions.compute_recovered, 
+                                                            "susceptible": model_functions.compute_susceptible, 
+                                                            "dead": model_functions.compute_dead, 
+                                                            "R0": model_functions.compute_R0, 
+                                                            "severe_cases":model_functions.compute_severe})
         self.datacollector.collect(self)
     
     def step(self):
