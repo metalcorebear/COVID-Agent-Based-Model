@@ -25,7 +25,7 @@ This is an SIR (susceptible, infected, recovered) model for COVID.  Model parame
 * recovery_days = Average number of days until recovery.
 * recovery_sd = Standard deviation of recovery_days.
 * severe = Probability of developing severe, symptomatic disease.
-* steps = number of days in siimulation.<br /><br />
+* steps = number of days in simulation.<br /><br />
 * chaos (in model_functions.py 'build_network' function) = Adjusting this parameter allows for social distancing compliance uncertainty.
 
 ## Instructions for Use
