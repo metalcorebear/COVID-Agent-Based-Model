@@ -11,13 +11,14 @@ import argparse
 import os
 from datetime import date as datemethod
 from datetime import datetime
-import model_functions
+import mesa_SIR.calculations_and_plots as c_p
 
 # Specify arguments
 def get_path():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', '--output', help='Enter the output path.', required=True)
+    parser.add_argument('-o', '--output', help='Enter the output path.', required=False)
     args = vars(parser.parse_args())
+    print (args)
     output_path = str(args['output'])
     return output_path
 
@@ -41,17 +42,18 @@ for i in range(steps):
 
 # Generate output    
 output_data = meme_model.datacollector.get_model_vars_dataframe()
-output_data.to_csv(output_file, encoding='UTF8')
+c_p.save_data(output_data, output_path = output_path, filename =filename)
 
 print (output_data)
 print('Filename:')
 print(filename)
 
-print('PLotting...')
-model_functions.plot_SIR(output_data, output_path)
-model_functions.plot_R0(output_data, output_path)
-model_functions.plot_severe(output_data, output_path)
+print('Plotting...')
+title = 'COVID ABM Model Output'
+c_p.plot_SIR(output_data, title, output_path)
+c_p.plot_R0(output_data, title, output_path)
+c_p.plot_severe(output_data, title, output_path)
 
-print('You are a great American!!')
+print('You are great!!')
 
 
