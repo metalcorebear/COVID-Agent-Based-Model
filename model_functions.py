@@ -125,7 +125,7 @@ def plot_SIR(df_out, output_path):
     plot_name = 'SIR_' + today + '_.png'
     ax = plt.subplot(111)
     for column in list(df_out.columns):
-        if (column != 'R0') and (column != 'severe_cases'):
+        if (column != 'R0') and (column != 'severe_cases') and (column != 'daily_deaths'):
             ax.plot(df_out[column], label=column)
     plt.title('COVID ABM Model Output - SIR')
     plt.xlabel('Day')
