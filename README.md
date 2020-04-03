@@ -11,7 +11,7 @@ Several parameters were taken from the following report:<br />
 https://www.imperial.ac.uk/media/imperial-college/medicine/sph/ide/gida-fellowships/Imperial-College-COVID19-symptom-progression-11-03-2020.pdf
 
 ## Model Description
-This is an SIR (susceptible, infected, recovered) model for COVID.  Model parameters can be set to simulate the changes in these three variables, as well as the reproduction number (R0) and number of severe cases, over time.  A negative R0 would indicate that the epidemic is becoming extinguished.  This can be used to simulate the effects of social distancing.
+This is an SIR (susceptible, infected, recovered) model for COVID.  Model parameters can be set to simulate the changes in these three variables, as well as the reproduction number (R0), number of severe cases, and daily deaths over time.  A negative R0 would indicate that the epidemic is becoming extinguished.  This can be used to simulate the effects of social distancing.
 
 ## Model Parameters
 * ptrans = Transmission probability.
@@ -25,7 +25,7 @@ This is an SIR (susceptible, infected, recovered) model for COVID.  Model parame
 * recovery_days = Average number of days until recovery.
 * recovery_sd = Standard deviation of recovery_days.
 * severe = Probability of developing severe, symptomatic disease.
-* steps = number of days in simulation.<br /><br />
+* steps = number of days in siimulation.<br /><br />
 * chaos (in model_functions.py 'build_network' function) = Adjusting this parameter allows for social distancing compliance uncertainty.
 
 ## Instructions for Use
