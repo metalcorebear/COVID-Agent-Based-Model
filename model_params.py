@@ -19,6 +19,6 @@ Created on Tue Mar 31 14:37:10 2020
 # steps = number of days in siimulation.
 
 parameters = {'I0':0.01, 'ptrans':0.25, 'progression_period':3, 
-              'progression_sd':2, 'population':1000, 'interactions':12,
+              'progression_sd':2, 'population':1000, 'interactions':6,
               'reinfection_rate':0.00, 'death_rate':0.0193, 
               'recovery_days':21, 'recovery_sd':7, 'severe':0.18, 'steps':90}
