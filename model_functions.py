@@ -5,30 +5,29 @@ Created on Tue Mar 31 14:36:25 2020
 @author: metalcorebear
 """
 
-import random
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 from datetime import date as datemethod
 from datetime import datetime
+from scipy.stats import bernoulli
 
-#Random output generator
+
+#Bernoulli random output generator
 def coin_flip(ptrue):
-    test = random.uniform(0.0,1.0)
-    if ptrue == 0:
+    test = bernoulli.rvs(ptrue, size=1)
+    if test[0] == 0:
         out = False
-    elif test < ptrue:
-        out = True
     else:
-        out = False
+        out = True
     return out
 
 
 # Determine if infection is transmitted
-def infect(agent_1, agent_2, ptrans, psevere, reinfection_rate):
+def infect(agent_1, agent_2, ptrans, psevere, reinfection_rate, immune_fraction):
     was_infected = agent_2.was_infected
-    if (agent_2.infected == False) and (agent_2.susceptible == True):
+    if (agent_2.infected == False) and (agent_2.susceptible == True) and (agent_2.immune == False):
         if agent_1.infected == True:
             if agent_2.was_infected == False:
                 agent_2.infected = coin_flip(ptrans)

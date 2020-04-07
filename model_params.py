@@ -18,7 +18,8 @@ Created on Tue Mar 31 14:37:10 2020
 # severe = Probability of developing severe, symptomatic disease.
 # steps = number of days in siimulation.
 
-parameters = {'I0':0.01, 'ptrans':0.25, 'progression_period':3, 
-              'progression_sd':2, 'population':1000, 'interactions':6,
-              'reinfection_rate':0.00, 'death_rate':0.0193, 
+parameters = {'I0':0.00011, 'ptrans':0.25, 'progression_period':3, 
+              'progression_sd':2, 'population':7022, 'interactions':6,
+              'reinfection_rate':0.00, 'death_rate':0.0046, 'immune_fraction':0.00, 
               'recovery_days':21, 'recovery_sd':7, 'severe':0.18, 'steps':90}
+

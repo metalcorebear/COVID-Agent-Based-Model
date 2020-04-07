@@ -16,7 +16,11 @@ class human(Agent):
     def __init__(self, unique_id, pos, model):
         super().__init__(unique_id, model)
         self.pos = pos
-        self.infected = model_functions.coin_flip(model_params.parameters['I0'])
+        self.immune = model_functions.coin_flip(model_params.parameters['immune_fraction'])
+        if self.immune == False:
+            self.infected = model_functions.coin_flip(model_params.parameters['I0'])
+        else:
+            self.infected = False
         if self.infected == False:
             self.susceptible = True
             self.model.susceptible += 1
@@ -35,7 +39,7 @@ class human(Agent):
         if self.alive == True:
             for neighbor in self.model.grid.get_neighbors(self.pos):
                 neighbor_obj = self.model.schedule.agents[neighbor]
-                infected_bool, was_infected = model_functions.infect(self, neighbor_obj, model_params.parameters['ptrans'], model_params.parameters['severe'], model_params.parameters['reinfection_rate'])
+                infected_bool, was_infected = model_functions.infect(self, neighbor_obj, model_params.parameters['ptrans'], model_params.parameters['severe'], model_params.parameters['reinfection_rate'], model_params.parameters['immune_fraction'])
                 if infected_bool == True:
                     self.model.infected += 1
                     neighbor_obj.susceptible = False
