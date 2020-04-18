@@ -16,26 +16,25 @@ import mesa_SIR.calculations_and_plots as c_p
 
 class COVID_model(Model):
     
-    def __init__(self):
+    def __init__(self, interactions, population, ptrans, reinfection_rate, I0, severe, progression_period,
+                        progression_sd, death_rate, recovery_days, recovery_sd):
         super().__init__(Model)
         
         self.susceptible = 0
         self.dead = 0
         self.recovered = 0
         self.infected = 0
-        interactions = model_params.parameters['interactions']
-        self.population = model_params.parameters['population']
-        self.SIR_instance = SIR.Infection(self, ptrans = model_params.parameters['ptrans'],
-                                          reinfection_rate = model_params.parameters['reinfection_rate'],
-                                          I0= model_params.parameters["I0"],
-                                          severe = model_params.parameters["severe"],
-                                          progression_period = model_params.parameters["progression_period"],
-                                          progression_sd = model_params.parameters["progression_sd"],
-                                          death_rate = model_params.parameters["death_rate"],
-                                          recovery_days = model_params.parameters["recovery_days"],
-                                          recovery_sd = model_params.parameters["recovery_sd"])
-
-
+        interactions = interactions
+        self.population = population
+        self.SIR_instance = SIR.Infection(self, ptrans = ptrans,
+                                          reinfection_rate = reinfection_rate,
+                                          I0=I0,
+                                          severe=severe,
+                                          progression_period=progression_period,
+                                          progression_sd=progression_sd,
+                                          death_rate=death_rate,
+                                          recovery_days=recovery_days,
+                                          recovery_sd=recovery_sd)
         G = SIR.build_network(interactions, self.population)
         self.grid = NetworkGrid(G)
         self.schedule = RandomActivation(self)
@@ -43,29 +42,24 @@ class COVID_model(Model):
         self.running = True
     
         for node in range(self.population):
-            new_agent = agent.human(node, self) #what was self.next_id()
+            new_agent = agent.human(node, self)
             self.grid.place_agent(new_agent, node)
             self.schedule.add(new_agent)
 
         #self.meme = 0
-        self.datacollector = DataCollector(model_reporters={"infected": lambda m: c_p.compute(m,'infected'),
-                                                            "recovered": lambda m: c_p.compute(m,'recovered'),
-                                                            "susceptible": lambda m: c_p.compute(m,"susceptible"),
-                                                            "dead": lambda m: c_p.compute(m, "dead"),
-                                                            "R0": lambda m: c_p.compute(m, "R0"),
-                                                            "severe_cases": lambda m: c_p.compute(m,"severe")})
+        self.datacollector = DataCollector(model_reporters={"infected": [c_p.compute, [self,'recovered']],
+                                                            "recovered": [c_p.compute, [self,'recovered']],
+                                                            "susceptible": [c_p.compute, [self,"susceptible"]],
+                                                            "dead": [c_p.compute, [self, "dead"]],
+                                                            "R0": [c_p.compute, [self, "R0"]],
+                                                            "severe_cases": [c_p.compute, [self,"severe"]]})
         self.datacollector.collect(self)
     
     def step(self):
+
         self.schedule.step()
         
         self.datacollector.collect(self)
-        '''
-        for a in self.schedule.agents:
-            if a.alive == False:
-                self.schedule.remove(a)
-                self.dead_agents.append(a.unique_id)
-        '''
 
         if self.dead == self.schedule.get_agent_count():
             self.running = False
